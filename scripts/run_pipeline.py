@@ -122,7 +122,7 @@ def main() -> None:
         epochs=args.epochs,
     )
     kd_config = configure(
-        read_yaml(project_root / "configs/thesis_reconstruction.yaml"),
+        read_yaml(project_root / "configs/cbam_kd.yaml"),
         seed=args.seed,
         output_dir=output_root / "cbam_kd_student",
         data_root=data_root,
