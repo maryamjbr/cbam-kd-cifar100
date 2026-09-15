@@ -1,49 +1,49 @@
 # Reproducibility notes
 
-The modular code in this repository was reconstructed from the original
-notebook, the thesis, and the saved model checkpoints. The original notebook is
-kept in `notebooks/original_experiment.ipynb` for reference.
+This repository contains the maintained implementation used for the thesis experiments. The modular code in `src/` and `scripts/` is the primary implementation, while the earlier exploratory notebook is retained at `notebooks/original_experiment.ipynb` for reference.
 
-A few differences are important when comparing a new run with the historical
-results.
+## Experiment pipeline
 
-## Issues found in the original notebook
+The reported experiments use a ResNet-56 teacher and ResNet-20 student on CIFAR-100. The official 50,000-image training set is divided into 45,000 training images and 5,000 validation images using a fixed split seed. The official 10,000-image test set is reserved for final evaluation after checkpoint selection.
 
-1. The loss function expects student logits before teacher logits, but the
-   training call passes them in the opposite order. This changes both the
-   cross-entropy term and the direction of logit distillation.
+The main CBAM-KD configuration is stored in:
 
-2. The validation block computes new teacher and student feature dictionaries,
-   but then applies CBAM to feature tensors left over from the training loop.
+```text
+configs/cbam_kd.yaml
+```
 
-3. The CBAM modules are created with trainable parameters, but only the student
-   model parameters are passed to the optimizer.
+The teacher is trained first and its best validation checkpoint is then supplied to the CBAM-KD training script.
 
-4. The official CIFAR-100 test loader is used repeatedly during training to
-   select the best checkpoint. The modular code instead creates a validation
-   subset from the training data and evaluates the test set only after model
-   selection.
+## Implementation notes
 
-5. The written thesis and the notebook do not use exactly the same training
-   hyperparameters. The thesis describes 250 epochs, an initial learning rate of
-   0.1, and stepwise learning-rate decay. The notebook contains a 400-epoch run
-   with a 0.001 initial learning rate and cosine annealing.
+During development, the exploratory notebook and the final modular pipeline differed in several important implementation details. The maintained pipeline uses the following behavior:
 
-## Current repository behavior
+1. Student and teacher logits are passed explicitly to the distillation loss in the correct order.
 
-The scripts in `scripts/` use explicit student/teacher argument names, current
-validation features, a held-out validation split, and include the distillation
-CBAM parameters in the optimizer. The configuration
-`configs/thesis_reconstruction.yaml` follows the written thesis description as
-closely as the available records allow.
+2. Validation uses feature tensors produced by the current validation batch.
 
-The historical checkpoints are preserved unchanged. In particular,
-`resnet20_kd_best.pth` contains only the ResNet-20 student weights. It does not
-store the CBAM weights, optimizer state, scheduler state, random split indices,
-or other run metadata. For that reason, the original training run cannot be
-resumed exactly from the supplied checkpoint.
+3. The trainable CBAM parameters are included in the optimizer together with the student parameters.
 
-The original accuracy values are therefore labeled as thesis-reported results.
-Two clean 250-epoch runs of the current pipeline (seeds 42 and 2025) are reported
-separately in the README and `results/reproduced_results.csv`; they do not
-retroactively validate the exact historical training procedure.
+4. Checkpoint selection is based on a held-out validation subset rather than repeated evaluation on the official test set.
+
+5. The reported experiments use 250 epochs, an initial learning rate of 0.1, and MultiStepLR decay at epochs 150 and 200.
+
+## Checkpoints
+
+Model checkpoints are not committed to Git. A standard training sequence is:
+
+```bash
+python scripts/train_baseline.py --config configs/resnet20_baseline.yaml
+python scripts/train_baseline.py --config configs/resnet56_teacher.yaml
+python scripts/train_kd.py \
+  --config configs/cbam_kd.yaml \
+  --teacher-checkpoint runs/resnet56_teacher/best.pth
+```
+
+The checkpoint saved by the modular training scripts contains the model state and experiment metadata needed for evaluation. Large `.pth`, `.pt`, and `.ckpt` files remain excluded through `.gitignore`.
+
+## Reported runs
+
+The main results reported in the README were obtained from two complete 250-epoch runs using optimization seeds 42 and 2025 with a fixed train/validation split. The corresponding summary values are stored in `results/main_results.csv`.
+
+Because only two optimization seeds are reported, the resulting standard deviations should be interpreted as descriptive rather than as a precise estimate of population-level training variance.
