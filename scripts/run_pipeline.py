@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the complete baseline, teacher, corrected KD, evaluation, and t-SNE pipeline."""
+"""Run the complete baseline, teacher, CBAM-KD, evaluation, and t-SNE pipeline."""
 
 from __future__ import annotations
 
