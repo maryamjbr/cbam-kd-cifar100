@@ -1,0 +1,4 @@
+model,role,reported_top1_percent,source,status
+ResNet-56,teacher,72.55,B.Sc. thesis Table 1,reported_not_rerun
+ResNet-20,student baseline,68.03,B.Sc. thesis Tables 1 and 3,reported_not_rerun
+ResNet-20 CBAM-KD,distilled student,68.68,B.Sc. thesis Tables 2 and 3,reported_not_rerun

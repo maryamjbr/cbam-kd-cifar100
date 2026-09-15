@@ -1,0 +1,4 @@
+seed,baseline_top1_percent,teacher_top1_percent,vanilla_kd_top1_percent,cbam_kd_top1_percent
+42,68.05,71.81,70.18,69.92
+2025,68.25,71.33,70.17,70.56
+mean,68.15,71.57,70.175,70.24

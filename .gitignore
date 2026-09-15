@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environments and editors
+.venv/
+venv/
+.idea/
+.vscode/
+.DS_Store
+__MACOSX/
+*~
+
+# Local data, training outputs, and model weights
+data/
+runs/
+*.log
+*.pth
+*.pt
+*.ckpt
+*.zip
+*.tar
+*.tar.gz
+
+# Generated and working directories retained locally
+tmp/
+CBAM_KD_Thesis_Revised_Source_v2/
+results/kaggle_runs/
+results/kaggle_vanilla_runs/
+
+# Generated document copies
+docs/*.pdf
+
+# R/RStudio
+.Rhistory

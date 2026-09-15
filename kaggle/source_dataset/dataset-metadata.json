@@ -1,0 +1,10 @@
+{
+  "title": "CBAM KD CIFAR-100 Source",
+  "id": "maryamjabbari/cbam-kd-cifar100-source",
+  "licenses": [
+    {
+      "name": "unknown"
+    }
+  ],
+  "isPrivate": true
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "file": "resnet20_cifar100_best.pth",
+    "bytes": 1163758,
+    "sha256": "075f2c7f237f168cc6faaf9c50d96821f7bc37eb9a2a0e9bccaadeb53d639428",
+    "architecture": "resnet20",
+    "num_classes": 100,
+    "tensor_elements": 279913,
+    "missing_keys": [],
+    "unexpected_keys": []
+  },
+  {
+    "file": "resnet20_kd_best.pth",
+    "bytes": 1162902,
+    "sha256": "8ed42840d6bc905adf66d1f02e325082bae7669523a5c9e118e9b60f34fd497f",
+    "architecture": "resnet20",
+    "num_classes": 100,
+    "tensor_elements": 279913,
+    "missing_keys": [],
+    "unexpected_keys": []
+  },
+  {
+    "file": "resnet56_cifar100_best.pth",
+    "bytes": 3581670,
+    "sha256": "73edefa1d5b5d4eb139763cb6b0563dce0ab7110bbd87e18c2965d601a2ac1f9",
+    "architecture": "resnet56",
+    "num_classes": 100,
+    "tensor_elements": 865933,
+    "missing_keys": [],
+    "unexpected_keys": []
+  }
+]

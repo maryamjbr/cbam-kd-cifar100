@@ -1,0 +1,11 @@
+{
+  "dataset": "CIFAR-100",
+  "metric": "Top-1 accuracy (%)",
+  "status": "Reported in the thesis; not rerun with the current modular training code",
+  "results": [
+    {"model": "ResNet-56", "role": "teacher", "top1_percent": 72.55},
+    {"model": "ResNet-20", "role": "student baseline", "top1_percent": 68.03},
+    {"model": "ResNet-20 CBAM-KD", "role": "distilled student", "top1_percent": 68.68}
+  ],
+  "reported_gain_percentage_points": 0.65
+}

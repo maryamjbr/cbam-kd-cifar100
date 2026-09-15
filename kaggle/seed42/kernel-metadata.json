@@ -1,0 +1,18 @@
+{
+  "id": "maryamjabbari/cbam-kd-cifar-100-complete-pipeline-seed-42",
+  "title": "CBAM-KD CIFAR-100 Complete Pipeline - Seed 42",
+  "code_file": "kernel.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "dataset_sources": [
+    "maryamjabbari/cbam-kd-cifar100-source"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": [],
+  "machine_shape": "NvidiaTeslaT4"
+}

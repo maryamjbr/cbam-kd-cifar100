@@ -1,0 +1,20 @@
+{
+  "id": "maryamjabbari/vanilla-kd-resnet56-to-resnet20-seed-2025",
+  "title": "Vanilla KD ResNet56 to ResNet20 - Seed 2025",
+  "code_file": "kernel.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "dataset_sources": [
+    "maryamjabbari/vanilla-kd-cifar100-source"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [
+    "maryamjabbari/cbam-kd-cifar-100-complete-pipeline-seed-2025"
+  ],
+  "model_sources": [],
+  "machine_shape": "NvidiaTeslaT4"
+}

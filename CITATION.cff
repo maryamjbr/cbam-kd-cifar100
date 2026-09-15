@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+title: "Feature-Based Knowledge Distillation with CBAM Attention"
+message: "Please cite the thesis and this repository if you use the code."
+type: software
+authors:
+  - family-names: Jabbari
+    given-names: Maryam
+version: 0.1.0
+abstract: >-
+  Code and reproducibility materials for CBAM-guided feature-based knowledge distillation
+  from ResNet-56 to ResNet-20 on CIFAR-100.
+license: BSD-3-Clause
