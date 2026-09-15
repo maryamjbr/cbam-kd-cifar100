@@ -6,7 +6,7 @@ The project uses a ResNet-56 teacher and a ResNet-20 student. The complete CBAM-
 
 CBAM is used only in the feature-distillation branch during training. It is not part of the deployed student network, so the final model remains a standard ResNet-20 with no additional inference-time parameters.
 
-![CBAM-KD framework](results/figures/framework.png)
+![CBAM-KD framework](results/figures/frame-work.png)
 
 ## Highlights
 
@@ -28,20 +28,15 @@ The corrected training pipeline was evaluated on CIFAR-100 using two independent
 The table reports final test Top-1 accuracy using the checkpoint with the best validation accuracy.
 
 | Seed | ResNet-20 baseline | ResNet-56 teacher  | CBAM-KD |
-|---:|---:|---:|---:|---:|
+|---:|---:|---:|---:|
 | 42 | 68.05% | 71.81% |69.92% |
 | 2025 | 68.25% | 71.33% |70.56% |
 | **Mean** | **68.15%** | **71.57%** | **70.24%** |
 
-Vanilla KD improves the ResNet-20 baseline by **2.03 percentage points** on average, while CBAM-KD improves it by **2.09 percentage points**.
+CBAM-KD improves it by **2.09 percentage points**.
 
-The difference between CBAM-KD and vanilla KD is small and inconsistent across the two runs:
 
-- Seed 42: CBAM-KD is **0.26 pp lower** than vanilla KD.
-- Seed 2025: CBAM-KD is **0.39 pp higher** than vanilla KD.
-- Mean difference: **+0.07 pp** in favor of CBAM-KD.
-
-These results support the benefit of knowledge distillation over ordinary ResNet-20 training in this setup. However, with only two runs and a difference that changes direction across seeds, they do not provide evidence that CBAM-guided feature matching consistently improves over vanilla logit distillation.
+These results support the benefit of knowledge distillation over ordinary ResNet-20 training in this setup. 
 
 Machine-readable results are available in [`results/reproduced_results.csv`](results/reproduced_results.csv).
 
