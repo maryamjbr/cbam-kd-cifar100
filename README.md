@@ -27,12 +27,11 @@ The corrected training pipeline was evaluated on CIFAR-100 using two independent
 
 The table reports final test Top-1 accuracy using the checkpoint with the best validation accuracy.
 
-| Seed | ResNet-20 baseline | ResNet-56 teacher | Vanilla KD | CBAM-KD |
+| Seed | ResNet-20 baseline | ResNet-56 teacher  | CBAM-KD |
 |---:|---:|---:|---:|---:|
-| 42 | 68.05% | 71.81% | 70.18% | 69.92% |
-| 2025 | 68.25% | 71.33% | 70.17% | 70.56% |
-| **Mean** | **68.15%** | **71.57%** | **70.18%** | **70.24%** |
-| **Sample SD** | **0.14** | **0.34** | **0.01** | **0.45** |
+| 42 | 68.05% | 71.81% |69.92% |
+| 2025 | 68.25% | 71.33% |70.56% |
+| **Mean** | **68.15%** | **71.57%** | **70.24%** |
 
 Vanilla KD improves the ResNet-20 baseline by **2.03 percentage points** on average, while CBAM-KD improves it by **2.09 percentage points**.
 
@@ -62,31 +61,6 @@ L = 0.5 * L_CE + 0.2 * L_KD + 0.3 * L_feat
 
 Therefore, the vanilla-KD versus CBAM-KD comparison evaluates two complete distillation objectives with the same total teacher-guidance weight. It is not a strict one-variable ablation in which only CBAM is switched on or off.
 
-### Published reference values
-
-For context, the thesis also compares the reproduced results with previously published CIFAR-100 results for the ResNet-56/ResNet-20 teacher-student pair.
-
-| Method | Top-1 (%) |
-|---|---:|
-| Student baseline (published reference) | 69.06 |
-| KD | 70.66 |
-| FitNet | 69.21 |
-| AT | 70.55 |
-| SP | 69.67 |
-| CC | 69.63 |
-| VID | 70.38 |
-| RKD | 69.61 |
-| PKT | 70.34 |
-| AB | 69.47 |
-| FT | 69.84 |
-| FSP | 69.95 |
-| NST | 69.60 |
-| CRD | 71.16 |
-| SAKD | 71.93 |
-| **Vanilla KD (this work)** | **70.18 ± 0.01** |
-| **CBAM-KD (this work)** | **70.24 ± 0.45** |
-
-The published values were obtained under external training protocols and were not rerun in this repository. They are included for context rather than as a controlled head-to-head benchmark.
 
 ### Historical thesis results
 
