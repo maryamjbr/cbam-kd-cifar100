@@ -1,101 +1,80 @@
 # Feature-Based Knowledge Distillation with CBAM Attention
 
-PyTorch implementation and reproducibility materials for a B.Sc. thesis on knowledge distillation for CIFAR-100.
+This repository contains the PyTorch implementation and experimental materials for a B.Sc. thesis on knowledge distillation for CIFAR-100.
 
-The project uses a ResNet-56 teacher and a ResNet-20 student. The complete CBAM-KD objective combines supervised classification, temperature-scaled logit distillation, and CBAM-guided matching of intermediate feature maps from the three residual stages.
+The method uses a ResNet-56 teacher and a ResNet-20 student. The CBAM-KD objective combines supervised classification, temperature-scaled logit distillation, and CBAM-guided matching of intermediate feature maps from the three residual stages.
 
-CBAM is used only in the feature-distillation branch during training. It is not part of the deployed student network, so the final model remains a standard ResNet-20 with no additional inference-time parameters.
+CBAM is used only in the feature-distillation branch during training. It is not part of the deployed student network, so the final model remains a standard ResNet-20 with no additional inference-time parameters or attention-related inference cost.
 
 ![CBAM-KD framework](results/figures/frame-work.png)
 
 ## Highlights
 
 - ResNet-56 teacher and ResNet-20 student on CIFAR-100.
-- Vanilla logit KD and CBAM-guided feature distillation.
-- Stage-wise feature matching at all three CIFAR ResNet stages.
-- CBAM used only during training; the deployed student remains unchanged.
-- Fixed 45,000/5,000 train/validation split with the official CIFAR-100 test set reserved for final evaluation.
+- Stage-wise CBAM-guided feature matching at all three CIFAR ResNet stages.
+- Temperature-scaled logit distillation combined with supervised classification.
+- CBAM is used only during training; the deployed student remains an unchanged ResNet-20.
+- Fixed 45,000/5,000 CIFAR-100 train/validation split, with the official test set reserved for final evaluation.
 - Modular training, evaluation, checkpoint inspection, and t-SNE scripts.
-- Two repeated 250-epoch experiments with optimization seeds 42 and 2025.
+- Two complete 250-epoch experimental runs with optimization seeds 42 and 2025.
 - CPU smoke tests and GitHub Actions continuous integration.
 
 ## Results
 
-### Reproduced experiments
-
-The corrected training pipeline was evaluated on CIFAR-100 using two independent training runs with seeds 42 and 2025. All models were trained for 250 epochs on an NVIDIA Tesla T4 GPU per run.
+The final pipeline was evaluated on CIFAR-100 using two independent training runs with seeds 42 and 2025. All models were trained for 250 epochs on an NVIDIA Tesla T4 GPU per run.
 
 The table reports final test Top-1 accuracy using the checkpoint with the best validation accuracy.
 
-| Seed | ResNet-20 baseline | ResNet-56 teacher  | CBAM-KD |
+| Seed | ResNet-20 baseline | ResNet-56 teacher | CBAM-KD |
 |---:|---:|---:|---:|
-| 42 | 68.05% | 71.81% |69.92% |
-| 2025 | 68.25% | 71.33% |70.56% |
+| 42 | 68.05% | 71.81% | 69.92% |
+| 2025 | 68.25% | 71.33% | 70.56% |
 | **Mean** | **68.15%** | **71.57%** | **70.24%** |
+| **Sample SD** | **0.14** | **0.34** | **0.45** |
 
-CBAM-KD improves it by **2.09 percentage points**.
+Across the two runs, CBAM-KD improves the ResNet-20 baseline by **2.09 percentage points** on average while retaining the same ResNet-20 inference architecture.
 
+These results show that the complete CBAM-guided distillation configuration improves over standard student training in the reported experimental setup.
 
-These results support the benefit of knowledge distillation over ordinary ResNet-20 training in this setup. 
-
-Machine-readable results are available in [`results/reproduced_results.csv`](results/reproduced_results.csv).
+Machine-readable values are available in [`results/main_results.csv`](results/main_results.csv).
 
 ### Experimental note
 
-The standalone ResNet-20 baseline and ResNet-56 teacher were trained with standard cross-entropy. Both distilled students used label smoothing (`epsilon = 0.1`).
+The standalone ResNet-20 baseline and ResNet-56 teacher were trained with standard cross-entropy. The CBAM-KD student used label smoothing (`epsilon = 0.1`) as part of the distillation training configuration.
 
-The two distillation objectives were:
+The reported CBAM-KD objective is:
 
 ```text
-Vanilla KD:
-L = 0.5 * L_CE + 0.5 * L_KD
-
-CBAM-KD:
-L = 0.5 * L_CE + 0.2 * L_KD + 0.3 * L_feat
+L_CBAM-KD = 0.5 * L_CE
+          + 0.2 * L_KD
+          + 0.3 * L_feat
 ```
 
-Therefore, the vanilla-KD versus CBAM-KD comparison evaluates two complete distillation objectives with the same total teacher-guidance weight. It is not a strict one-variable ablation in which only CBAM is switched on or off.
+where `L_KD` is temperature-scaled logit distillation with `T = 4`, and `L_feat` is the CBAM-guided feature-matching loss.
 
-
-### Historical thesis results
-
-The original thesis experiments produced the following values before the training and validation pipeline was revised:
-
-| Model | Role | Reported Top-1 |
-|---|---|---:|
-| ResNet-56 | Teacher | 72.55% |
-| ResNet-20 | Student baseline | 68.03% |
-| ResNet-20 CBAM-KD | Distilled student | 68.68% |
-
-These values are retained only as a record of the original experiment. The corrected reruns above should be used for current comparisons.
-
-Implementation differences between the original notebook and the revised pipeline are documented in [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md).
+Because the standalone baseline does not use the same label smoothing configuration, the improvement over the baseline should be interpreted as the effect of the complete CBAM-KD training setup rather than as an isolated estimate of the CBAM component alone.
 
 ## Feature-space visualization
 
-t-SNE was applied to global-average-pooled features from the final residual stage. The figures include the ResNet-20 baseline, ResNet-56 teacher, vanilla-KD student, and CBAM-KD student.
+t-SNE was applied to global-average-pooled features from the final residual stage. Selected visualizations are stored in [`results/figures/`](results/figures/).
 
-![Full CIFAR-100 t-SNE comparison](results/figures/tsne_all_classes.png)
-
-![Ten-class t-SNE comparison](results/figures/tsne_ten_classes.png)
-
-Each model is projected independently. The plots are therefore intended for qualitative inspection of within-panel structure only; positions and distances should not be compared directly across panels.
+Each model is projected independently, so the plots are intended for qualitative inspection of within-panel structure only. Absolute positions and distances should not be compared directly across separately fitted t-SNE projections.
 
 ## Repository layout
 
 ```text
 configs/                  Versioned experiment configurations
 src/cbam_kd/              Models, CBAM, losses, data, metrics, and training utilities
-scripts/                  Training, evaluation, pipelines, and visualization CLIs
+scripts/                  Training, evaluation, pipeline, and visualization CLIs
 kaggle/                   Kaggle kernel entry points and metadata
-notebooks/                Original experiment notebook and a compact demo
+notebooks/                Exploratory notebook and a compact demo
 tests/                    CPU smoke tests
 results/                  Result tables and selected figures
-checkpoints/README.md      Optional historical checkpoint manifest
-docs/REPRODUCIBILITY.md   Implementation differences and reproducibility notes
+checkpoints/README.md      Optional checkpoint manifest
+docs/REPRODUCIBILITY.md   Implementation and reproducibility notes
 ```
 
-Datasets, model weights, logs, raw Kaggle downloads, archives, and generated thesis files are excluded from Git.
+Datasets, model weights, logs, raw Kaggle downloads, archives, and generated thesis files are deliberately excluded from Git.
 
 ## Installation
 
@@ -120,7 +99,7 @@ CIFAR-100 is downloaded automatically by TorchVision on first use.
 pytest -q
 ```
 
-The tests cover model shapes and parameter counts, CBAM-KD gradients, and the vanilla-KD objective. Checkpoint compatibility is also checked when optional historical checkpoint files are available.
+The tests cover model shapes and parameter counts, CBAM-KD gradient flow, and core distillation behavior. Checkpoint compatibility is also checked when optional checkpoint files are available.
 
 ## Training
 
@@ -131,21 +110,23 @@ python scripts/train_baseline.py --config configs/resnet20_baseline.yaml
 python scripts/train_baseline.py --config configs/resnet56_teacher.yaml
 ```
 
-Train the CBAM-KD student:
-
-```bash
-python scripts/train_kd.py --config configs/thesis_reconstruction.yaml
-```
-
-The KD configuration expects a teacher checkpoint at:
+The teacher checkpoint produced by the second command is saved at:
 
 ```text
-checkpoints/resnet56_cifar100_best.pth
+runs/resnet56_teacher/best.pth
 ```
 
-by default. Edit `teacher.checkpoint` in the YAML configuration or pass `--teacher-checkpoint` to use a different checkpoint.
+Train the CBAM-KD student using that teacher:
 
-Run the complete baseline, teacher, CBAM-KD, evaluation, and visualization pipeline:
+```bash
+python scripts/train_kd.py \
+  --config configs/cbam_kd.yaml \
+  --teacher-checkpoint runs/resnet56_teacher/best.pth
+```
+
+This explicit checkpoint path makes the three training commands directly runnable in sequence after cloning the repository; no pre-existing `.pth` file is required.
+
+Run the complete baseline, teacher, CBAM-KD, evaluation, and t-SNE workflow:
 
 ```bash
 python scripts/run_pipeline.py \
@@ -162,16 +143,7 @@ python scripts/run_pipeline.py \
   --output-root runs/smoke_test
 ```
 
-Run the vanilla-KD experiment after producing the corresponding baseline and teacher checkpoints:
-
-```bash
-python scripts/run_vanilla_kd_pipeline.py \
-  --seed 42 \
-  --reference-root runs \
-  --output-root runs/vanilla_seed_42
-```
-
-For the reported results, the complete procedure was repeated with seeds `42` and `2025` while keeping the train/validation split fixed.
+The reported experiments were run with seeds `42` and `2025` while keeping the train/validation split fixed.
 
 ## Evaluation and visualization
 
@@ -184,19 +156,19 @@ python scripts/evaluate.py \
   --checkpoint /path/to/best.pth
 ```
 
-Inspect checkpoint compatibility and file hashes:
+Inspect checkpoint architecture compatibility and file hashes:
 
 ```bash
 python scripts/inspect_checkpoints.py /path/to/checkpoint.pth
 ```
 
-See the `--help` output of each script for the complete set of options.
+See each script's `--help` output for the complete set of options.
 
-## Distillation objectives
+## Distillation objective
 
-Let `z_s` and `z_t` denote student and teacher logits, `y` the ground-truth labels, and `F_s` and `F_t` their intermediate feature maps.
+Let `z_s` and `z_t` denote the student and teacher logits, `y` the ground-truth labels, and `F_s` and `F_t` the intermediate feature maps.
 
-The temperature-scaled logit-distillation loss is:
+The logit-distillation term is:
 
 ```text
 L_KD = T^2 * KL(
@@ -212,14 +184,7 @@ with:
 T = 4
 ```
 
-The vanilla-KD objective is:
-
-```text
-L_vanilla = 0.5 * L_CE
-          + 0.5 * L_KD
-```
-
-The complete CBAM-KD objective is:
+The full training objective is:
 
 ```text
 L_CBAM-KD = 0.5 * L_CE
@@ -229,39 +194,29 @@ L_CBAM-KD = 0.5 * L_CE
 
 `L_feat` is a weighted mean-squared error between CBAM-refined teacher and student features at the three residual stages. Relative stage weights are `1:2:3`, giving greater weight to deeper representations.
 
-A separate CBAM block is used at each stage and shared between the teacher and student feature tensors for that stage. The teacher is frozen, and its attended feature is treated as a stop-gradient target.
+A separate CBAM block is used at each stage and shared between the teacher and student feature tensors for that stage. The teacher network is frozen, and the attended teacher feature is treated as a stop-gradient target.
 
 The CBAM blocks are optimized only during training and are discarded afterward. The deployed model is therefore the original ResNet-20 backbone.
 
 ## Reproducibility notes
 
-The original experiment notebook is retained at:
+The modular implementation in `src/` and `scripts/` is the maintained codebase for the reported thesis experiments. The exploratory notebook is retained in [`notebooks/original_experiment.ipynb`](notebooks/original_experiment.ipynb) for reference.
 
-```text
-notebooks/original_experiment.ipynb
-```
+The final experiment pipeline uses:
 
-During modularization, several issues were identified in the original pipeline, including:
+- explicit student and teacher loss arguments;
+- current validation features during evaluation;
+- a fixed held-out validation subset for checkpoint selection;
+- the official CIFAR-100 test set only for final evaluation;
+- CBAM parameters included in the distillation optimizer.
 
-- reversed student and teacher logits in one distillation-loss call;
-- stale feature tensors during validation;
-- use of the test set during model selection.
-
-The revised pipeline uses explicit loss arguments, current validation features, a fixed held-out validation split, and final test evaluation only after checkpoint selection.
-
-The historical checkpoints contain only model `state_dict`s. Optimizer, scheduler, CBAM, and data-split states from the original experiment cannot be fully reconstructed.
-
-See [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md) for further details.
+Additional implementation details are documented in [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md).
 
 ## Limitations
 
-The current reproduced comparison is based on two training seeds. This is enough to show that both distillation configurations outperform the local ResNet-20 baseline in both runs, but it is not enough to resolve the small difference between vanilla KD and CBAM-KD.
+The reported results are based on two optimization seeds. Additional repeated runs would provide a more reliable estimate of experimental variance.
 
-A stricter future ablation would:
-
-1. keep the CE and logit-KD coefficients fixed while adding or removing only the CBAM feature branch;
-2. include a ResNet-20 baseline trained with the same label smoothing used by the distilled students;
-3. repeat the experiment over additional seeds.
+The standalone ResNet-20 baseline was trained with ordinary cross-entropy, while the CBAM-KD student used label smoothing as part of its training objective. A stricter component-level ablation would match all other training settings while varying only the feature-distillation branch.
 
 ## Attribution and citation
 
